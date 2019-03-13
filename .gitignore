@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+.tmp/
+node_modules
+
+\.vscode/launch\.json
+
+\.vscode/settings\.json
