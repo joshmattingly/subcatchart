@@ -45,19 +45,13 @@ import { VisualSettings } from "./settings";
 interface ChartViewModel{
     dataPoints: SubcatDataPoint[];
     dataMax: number;
-    settings: ChartSettings;
 }
 
 interface SubcatDataPoint{
-    desc: string;
-    xMetric: PrimitiveValue;
+    category: string;
+    subcategory: string;
+    value: number;
     changeMetric: PrimitiveValue;
-    color: string;
-    symbol: string;
-    rotation: number;
-    strokeColor: string;
-    strokeWidth: number;
-    selectionId: ISelectionId;
 }
 
 interface ChartSettings{
@@ -86,11 +80,37 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
         }
     };
 
+    let testData: SubcatDataPoint[] = [
+        {
+            category: 'BRAND A',
+            subcategory: 'PROD A',
+            value: 1000,
+            changeMetric: 0.05
+        },
+        {
+            category: 'BRAND B',
+            subcategory: 'PROD B',
+            value: 20,
+            changeMetric: -0.25
+        },
+        {
+            category: 'BRAND A',
+            subcategory: 'PROD C',
+            value: 300,
+            changeMetric: 0.15
+        },
+        {
+            category: 'BRAND B',
+            subcategory: 'PROD D',
+            value: 500,
+            changeMetric: -0.05
+        }
+    ];
+
     let viewModel: ChartViewModel = {
-        dataPoints: [],
-        dataMax: 0,
-        settings:<ChartSettings>{}
-    }
+        dataPoints: testData,
+        dataMax: d3.max(testData.map((d) => d.value))
+    };
     
     if (!dataViews){
         return viewModel;
@@ -103,11 +123,9 @@ export class Visual implements IVisual {
 
     private host: IVisualHost;
     private svg: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
-    
     private textValue: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
-
     private brandContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
-    
+
     constructor(options: VisualConstructorOptions) {
         // TODO: add options.host
 
@@ -124,14 +142,15 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-        let dataViews = options.dataViews;
+        let dataView = options.dataViews[0];
 
         let width: number = options.viewport.width;
         let height: number = options.viewport.height;
 
-        this.textValue.text("Test")
-            .attr("x", 20)
-            .attr("y", 20);
+        this.textValue
+        .text(dataView.matrix.valueSources[1].displayName )
+        .attr("x", "50%")
+        .attr("y", "50%");
 
     }
 }

@@ -7,17 +7,17 @@
             "kind":"Grouping"
         },
         {
-            "name":"Subcategory",
-            "displayName":"Subcategory",
-            "displayNameKey":"Visual_Subcategory",
-            "kind":"Grouping"
-        },
-        {
             "name":"Measure",
             "displayName":"Measure",
             "displayNameKey": "Visual_Values",
             "kind":"Measure"
 
+        },
+        {
+            "name":"ChangeMetric",
+            "displayName": "Change Metric",
+            "displayNameKey": "Visual_Change",
+            "kind": "Measure"
         }
     ],
     "dataViewMappings": [
@@ -28,16 +28,16 @@
                         "in":"Category"
                     }
                 },
-                "columns":{
-                    "for":{
-                        "in":"Subcategory"
+                "columns": {
+                    "for": {
+                        "in": "ChangeMetric"
                     }
                 },
                 "values":{
                     "select":[
                         {
                             "for":{
-                                "in":"measure"
+                                "in":"Measure"
                             }
                         }
                     ]   
