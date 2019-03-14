@@ -92,6 +92,9 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
         settings:<ChartSettings>{}
     }
     
+    if (!dataViews){
+        return viewModel;
+    }
     //if the data being passed in is completely missing, send the empty viewmodel.
     //TODO: Map to matrix data structure.
 }
@@ -100,6 +103,9 @@ export class Visual implements IVisual {
 
     private host: IVisualHost;
     private svg: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    
+    private textValue: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+
     private brandContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
     
     constructor(options: VisualConstructorOptions) {
@@ -113,14 +119,19 @@ export class Visual implements IVisual {
         this.brandContainer = this.svg
         .append('g')
         .classed('brandContainer', true);
+
+        this.textValue = this.brandContainer.append("text");
     }
 
     public update(options: VisualUpdateOptions) {
-        
-        //TODO: create view model
+        let dataViews = options.dataViews;
 
-        // get data
-        
-        // set axes based on number of categories and max of x metric
+        let width: number = options.viewport.width;
+        let height: number = options.viewport.height;
+
+        this.textValue.text("Test")
+            .attr("x", 20)
+            .attr("y", 20);
+
     }
 }
