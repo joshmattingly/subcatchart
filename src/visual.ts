@@ -122,9 +122,8 @@ export class Visual implements IVisual {
     private host: IVisualHost;
     private svg: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
     private symbol: d3.Symbol<d3.BaseType, any>;
-    private chartContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
-    private textValue: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
-    private brandContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    private xAxis: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    private yAxis: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
 
     constructor(options: VisualConstructorOptions) {
 
@@ -134,7 +133,6 @@ export class Visual implements IVisual {
             .classed('subcatChart', true);
 
         this.symbol = d3.symbol();
-
     }
 
     public update(options: VisualUpdateOptions) {
@@ -146,24 +144,44 @@ export class Visual implements IVisual {
 
         let dataMax = d3.max(viewModel.dataPoints, (d)=>+d.value);
         let increment: number = 3;
+
+        // creates a unique list of selected categories (based on PBI filter)
+        let categoryList = d3.map(viewModel.dataPoints, (d)=> d.category.toString());
+
         let xScale = d3.scaleLinear()
             .domain([0, dataMax])
             .range([0, width]);
-
-        let categoryList = d3.map(viewModel.dataPoints, (d)=> d.category.toString());
 
         let yScale = d3.scaleBand()
             .domain(categoryList.keys())
             .range([height, 0])
 
+
+        // create the axes
+        let xAxis = d3.axisBottom(xScale);
+        let yAxis = d3.axisLeft(yScale);
+
         // clear out the current view
         this.svg.select(".datapoints").remove();
+        this.svg.selectAll(".axis").remove();
 
         this.svg
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        //append the axes
+        this.svg
+            .append("g")
+            .attr("class", "axis xAxis")
+            .attr("transform", "translate(3, " + height + ")")
+            .call(xAxis);
+
+        this.svg
+            .append("g")
+            .attr("class", "axis yAxis")
+            .call(yAxis);
 
         this.svg
         .append("g")
@@ -173,8 +191,21 @@ export class Visual implements IVisual {
         .enter()
         .append("path")
         .attr("d", this.symbol.size(20).type(d3.symbolTriangle))
-        .attr("transform", (d) => "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ")")
-        .attr("fill", "steelblue");
+        .attr("fill", function(d){
+            if (+d.changeMetric < 0){
+                return 'red';
+            } else if (+d.changeMetric > 0){
+                return 'green';
+            } else { return 'blue'}})
+        .attr("transform", function(d){
+            if (+d.changeMetric < 0){
+                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(180)";
+            } else if (+d.changeMetric > 0){
+                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ")";
+            } else {
+                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(90)";
+            };
+        });
 
     }
 }
