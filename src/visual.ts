@@ -138,6 +138,7 @@ export class Visual implements IVisual {
     public update(options: VisualUpdateOptions) {
         let viewModel: ChartViewModel = visualTransform(options, this.host);
 
+        // TODO: Make margins dynamic based on axis label length
         let margin = {top: 10, right: 10, bottom: 10, left: 150};
         let width: number = options.viewport.width - margin.left - margin.right;
         let height: number = options.viewport.height - margin.top - margin.bottom;
@@ -175,11 +176,12 @@ export class Visual implements IVisual {
         this.svg
             .append("g")
             .attr("class", "axis xAxis")
-            .attr("transform", "translate(3, " + height + ")")
+            .attr("transform", "translate("+ margin.left + "," + height + ")")
             .call(xAxis);
 
         this.svg
             .append("g")
+            .attr("transform", "translate(" + margin.left + ", 0)")
             .attr("class", "axis yAxis")
             .call(yAxis);
 
@@ -199,11 +201,11 @@ export class Visual implements IVisual {
             } else { return 'blue'}})
         .attr("transform", function(d){
             if (+d.changeMetric < 0){
-                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(180)";
+                return "translate(" + (xScale(+d.value) + margin.left) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(180)";
             } else if (+d.changeMetric > 0){
-                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ")";
+                return "translate(" + (xScale(+d.value) + margin.left) + ", " + (yScale(d.category.toString()) + increment) + ")";
             } else {
-                return "translate(" + xScale(+d.value) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(90)";
+                return "translate(" + (xScale(+d.value) + margin.left) + ", " + (yScale(d.category.toString()) + increment) + ") rotate(90)";
             };
         });
 
