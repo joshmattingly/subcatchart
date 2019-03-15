@@ -1,1 +1,25 @@
-{"visual":{"name":"subcatchart","displayName":"subcatchart","guid":"subcatchartADAA1FDFB38B46EAADE05F1D905DA2CE","visualClassName":"Visual","version":"1.0.0","description":"","supportUrl":"","gitHubUrl":""},"apiVersion":"2.2.0","author":{"name":"","email":""},"assets":{"icon":"assets/icon.png"},"externalJS":null,"style":"style/visual.less","capabilities":"capabilities.json","dependencies":null,"stringResources":[]}
+{
+    "visual": {
+        "name": "subcatchart",
+        "displayName": "Subcategory Chart",
+        "guid": "subcatchartADAA1FDFB38B46EAADE05F1D905DA2CE",
+        "visualClassName": "Visual",
+        "version": "1.0.0",
+        "description": "Maps primary metric of a given subcategory along the x-axis, with a change metric designating direction of arrow",
+        "supportUrl": "",
+        "gitHubUrl": ""
+    },
+    "apiVersion": "2.2.0",
+    "author": {
+        "name": "Josh Mattingly",
+        "email": "joshua.j.mattingly@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": null,
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": []
+}
