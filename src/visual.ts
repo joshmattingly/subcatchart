@@ -41,17 +41,17 @@ import PrimitiveValue = powerbi.PrimitiveValue;
 import ISelectionId = powerbi.visuals.ISelectionId;
 
 import { VisualSettings } from "./settings";
+import { Primitive } from "d3";
 
 interface ChartViewModel{
     dataPoints: ChartDataPoint[];
-    dataMax: number;
 }
 
 interface ChartDataPoint{
     category: PrimitiveValue;
     subcategory: PrimitiveValue;
-    value: number;
-    changeMetric: number;
+    value: PrimitiveValue;
+    changeMetric: PrimitiveValue;
 }
 
 interface ChartSettings{
@@ -82,20 +82,9 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
 
     let viewModel: ChartViewModel = {
         dataPoints: [],
-        dataMax: 0
     };
     
     // walk through the datatree to make sure there's at least one row of data
-    if (!dataViews
-        ||!dataViews[0].matrix
-        ||!dataViews[0].matrix.rows
-        ||!dataViews[0].matrix.rows.root
-        ||!dataViews[0].matrix.rows.root.children[0].value                          // Category
-        ||!dataViews[0].matrix.rows.root.children[0].children[0].value              // Subcategory
-        ||!dataViews[0].matrix.rows.root.children[0].children[0].values[0].value    // X-Axis metric
-        ||!dataViews[0].matrix.rows.root.children[0].children.values[1].value)       // Change metric
-        // if no data, return an empty viewModel
-        return viewModel;
     
     // if data was found, prepare the full viewModel
     let matrix = dataViews[0].matrix;
@@ -106,27 +95,25 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
     let dataMaxLocal: number;
 
     // for each category
-    for(let i = 0, count = category.children.length; i < count; i++){
-        let categoryName = category.children[i].value;
-        for (let x = 0, count = category.children[i].children.length; x < count; x++){
-            let subcategoryName = category.children[i].children[x].value;            
-            let xMetricValue = category.children[i].children[x].value[0].value;
-            let changeMetricValue = category.children[i].children[x].value[1].value;
+    category.children.forEach(function(entry){
+        let categoryName = entry.value;
+
+        entry.children.forEach(function(subentry){
+            let subCategoryName = subentry.value;
+            let xMetricValue = subentry.values[0].value;
+            let changeMetricValue = subentry.values[1].value;
 
             chartDataPoints.push({
                 category: categoryName,
-                subcategory: subcategoryName,
+                subcategory: subCategoryName,
                 value: xMetricValue,
                 changeMetric: changeMetricValue
             });
-        }
-    };
-
-    dataMaxLocal = d3.max(chartDataPoints, (d) => d.value);
-
+        });
+    });
+    
     return{
         dataPoints: chartDataPoints,
-        dataMax: dataMaxLocal
     };
 };        
 
@@ -134,34 +121,46 @@ export class Visual implements IVisual {
 
     private host: IVisualHost;
     private svg: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    private chartContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
     private textValue: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
     private brandContainer: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
 
     constructor(options: VisualConstructorOptions) {
-        // TODO: add options.host
 
         // set up the canvas
         this.svg = d3.select(options.element)
-        .append('svg')
-        .classed('subcatChart', true);
+            .append('svg')
+            .classed('subcatChart', true);
 
-        this.brandContainer = this.svg
-        .append('g')
-        .classed('brandContainer', true);
-
-        this.textValue = this.brandContainer.append("text");
     }
 
     public update(options: VisualUpdateOptions) {
-        let dataView = options.dataViews[0];
-
+        let viewModel: ChartViewModel = visualTransform(options, this.host);
         let width: number = options.viewport.width;
         let height: number = options.viewport.height;
 
-        this.textValue
-        .text(dataView.matrix.valueSources[1].displayName )
-        .attr("x", "50%")
-        .attr("y", "50%");
+        let dataMax = d3.max(viewModel.dataPoints, (d)=>+d.value);
+
+        let xScale = d3.scaleLinear()
+            .domain([0, dataMax])
+            .range([0, width]);
+
+        let yScale = d3.scaleLinear()
+            .domain([0, dataMax])
+            .range([height, 0])
+
+        this.svg
+        .attr("width", width)
+        .attr("height", height);
+
+        this.svg.selectAll("circle")
+        .data(viewModel.dataPoints)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => xScale(+d.value))
+        .attr("cy", (d) => yScale(+d.value))
+        .attr("r", 5)
+        .attr("fill", "steelblue");
 
     }
 }
