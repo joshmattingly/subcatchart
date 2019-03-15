@@ -233,7 +233,7 @@ export class SubcatChart implements IVisual {
     private static getTooltipData(value: any){
         return [
             {
-                displayName: "Category", 
+                displayName: "Category",
                 value: value.category,
                 color: value.color
             },
@@ -243,11 +243,11 @@ export class SubcatChart implements IVisual {
             },
             {
                 displayName: "Measure:",
-                value: value.value.toString()
+                value: value.value.toLocaleString()
             },
             {
                 displayName: "Change:",
-                value: null
+                value: (value.changeMetric * 100).toFixed(1).toString() + "%"
             }
 
     ];
