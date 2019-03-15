@@ -31,7 +31,7 @@ import powerbi from "powerbi-visuals-api";
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
-import IVisualHost = powerbi.extensibility.visual.IVisual;
+import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import DataView = powerbi.DataView;
@@ -40,8 +40,10 @@ import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnume
 import PrimitiveValue = powerbi.PrimitiveValue;
 import ISelectionId = powerbi.visuals.ISelectionId;
 
+import { ITooltipServiceWrapper, createTooltipServiceWrapper, TooltipEventArgs } from "./tooltipServiceWrapper";
+
 import { VisualSettings } from "./settings";
-import { Primitive, symbol, svg } from "d3";
+import { Primitive, symbol, svg, geoStereographicRaw } from "d3";
 
 interface ChartViewModel{
     dataPoints: ChartDataPoint[];
@@ -117,15 +119,18 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
     };
 };        
 
-export class Visual implements IVisual {
-
-    private host: IVisualHost;
+export class SubcatChart implements IVisual {
     private svg: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    private host: IVisualHost;
     private symbol: d3.Symbol<d3.BaseType, any>;
     private xAxis: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
     private yAxis: d3.Selection<d3.BaseType, any, d3.BaseType, any>;
+    private tooltipServiceWrapper: ITooltipServiceWrapper;
 
     constructor(options: VisualConstructorOptions) {
+        
+        this.host = options.host;
+        this.tooltipServiceWrapper = createTooltipServiceWrapper(this.host.tooltipService, options.element);
 
         // set up the canvas
         this.svg = d3.select(options.element)
@@ -133,9 +138,11 @@ export class Visual implements IVisual {
             .classed('subcatChart', true);
 
         this.symbol = d3.symbol();
+        
     }
 
     public update(options: VisualUpdateOptions) {
+
         let viewModel: ChartViewModel = visualTransform(options, this.host);
 
         // TODO: Make margins dynamic based on axis label length
@@ -195,7 +202,7 @@ export class Visual implements IVisual {
         .data(viewModel.dataPoints)
         .enter()
         .append("path")
-        .attr("d", this.symbol.size(20).type(d3.symbolTriangle))
+        .attr("d", this.symbol.size(50).type(d3.symbolTriangle))
         .attr("fill", function(d){
             if(num_cats == 1){
                 increment = height / (num_cats + 1);
@@ -218,5 +225,31 @@ export class Visual implements IVisual {
             };
         });
 
+        this.tooltipServiceWrapper.addTooltip(this.svg.selectAll('.datapoints'), 
+        (tooltipEvent: TooltipEventArgs<number>) => SubcatChart.getTooltipData(tooltipEvent.data),
+        (tooltipEvent: TooltipEventArgs<number>) => null);
+    }
+
+    private static getTooltipData(value: any){
+        return [
+            {
+                displayName: "Category", 
+                value: value.category,
+                color: value.color
+            },
+            {
+                displayName: "Subcategory",
+                value: value.subcategory
+            },
+            {
+                displayName: "Measure:",
+                value: value.value.toString()
+            },
+            {
+                displayName: "Change:",
+                value: null
+            }
+
+    ];
     }
 }

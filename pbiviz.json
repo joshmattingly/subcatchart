@@ -3,7 +3,7 @@
         "name": "subcatchart",
         "displayName": "Subcategory Chart",
         "guid": "subcatchartADAA1FDFB38B46EAADE05F1D905DA2CE",
-        "visualClassName": "Visual",
+        "visualClassName": "SubcatChart",
         "version": "1.0.0",
         "description": "Maps primary metric of a given subcategory along the x-axis, with a change metric designating direction of arrow",
         "supportUrl": "",

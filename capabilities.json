@@ -18,6 +18,12 @@
             "displayName": "Change Metric",
             "displayNameKey": "Visual_Change",
             "kind": "Measure"
+        },
+        {
+            "name": "Tooltips",
+            "displayName": "Tooltips",
+            "displayNameKey": "Visual_Tooltips",
+            "kind": "Measure"
         }
     ],
     "dataViewMappings": [
@@ -47,5 +53,14 @@
     ],
     "sorting": {
         "default": {}
+    },
+    "tooltips": {
+        "supportedTypes": {
+            "default": true,
+            "canvas": true
+        },
+        "roles": [
+            "Tooltips"
+        ]
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "visual",
+  "name": "subcatchart",
   "scripts": {
     "pbiviz": "pbiviz",
     "start": "pbiviz start",
