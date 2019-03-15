@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "author": {"name":"Josh Mattingly","email":"joshua.j.mattingly@gmail.com"},
+    "resources": [
+        {
+            "resourceId": "rId0",
+            "sourceType": 5,
+            "file": "resources/subcatchartADAA1FDFB38B46EAADE05F1D905DA2CE.pbiviz.json"
+        }
+    ],
+    "visual": {"name":"subcatchart","displayName":"Subcategory Chart","guid":"subcatchartADAA1FDFB38B46EAADE05F1D905DA2CE","visualClassName":"SubcatChart","version":"1.0.0","description":"Maps primary metric of a given subcategory along the x-axis, with a change metric designating direction of arrow","supportUrl":"www.joshmattingly.com","gitHubUrl":"https://github.com/joshmattingly/subcatchart"},
+    "metadata": {
+        "pbivizjson": {
+            "resourceId": "rId0"
+        }
+    }  
+}
