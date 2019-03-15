@@ -43,15 +43,15 @@ import ISelectionId = powerbi.visuals.ISelectionId;
 import { VisualSettings } from "./settings";
 
 interface ChartViewModel{
-    dataPoints: SubcatDataPoint[];
+    dataPoints: ChartDataPoint[];
     dataMax: number;
 }
 
-interface SubcatDataPoint{
-    category: string;
-    subcategory: string;
+interface ChartDataPoint{
+    category: PrimitiveValue;
+    subcategory: PrimitiveValue;
     value: number;
-    changeMetric: PrimitiveValue;
+    changeMetric: number;
 }
 
 interface ChartSettings{
@@ -85,6 +85,7 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
         dataMax: 0
     };
     
+    // walk through the datatree to make sure there's at least one row of data
     if (!dataViews
         ||!dataViews[0].matrix
         ||!dataViews[0].matrix.rows
@@ -92,13 +93,42 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
         ||!dataViews[0].matrix.rows.root.children[0].value                          // Category
         ||!dataViews[0].matrix.rows.root.children[0].children[0].value              // Subcategory
         ||!dataViews[0].matrix.rows.root.children[0].children[0].values[0].value    // X-Axis metric
-        ||!dataViews[0].matrix.rows.root.children[0].children.values[1].value       // Change metric
-        ){
+        ||!dataViews[0].matrix.rows.root.children[0].children.values[1].value)       // Change metric
+        // if no data, return an empty viewModel
+        return viewModel;
+    
+    // if data was found, prepare the full viewModel
+    let matrix = dataViews[0].matrix;
+    let category = dataViews[0].matrix.rows.root;
+    let subcategory = dataViews[0].matrix.rows.root.children[0];
 
-    }
-    //if the data being passed in is completely missing, send the empty viewmodel.
-    //TODO: Map to matrix data structure.
-}
+    let chartDataPoints: ChartDataPoint[] = [];
+    let dataMaxLocal: number;
+
+    // for each category
+    for(let i = 0, count = category.children.length; i < count; i++){
+        let categoryName = category.children[i].value;
+        for (let x = 0, count = category.children[i].children.length; x < count; x++){
+            let subcategoryName = category.children[i].children[x].value;            
+            let xMetricValue = category.children[i].children[x].value[0].value;
+            let changeMetricValue = category.children[i].children[x].value[1].value;
+
+            chartDataPoints.push({
+                category: categoryName,
+                subcategory: subcategoryName,
+                value: xMetricValue,
+                changeMetric: changeMetricValue
+            });
+        }
+    };
+
+    dataMaxLocal = d3.max(chartDataPoints, (d) => d.value);
+
+    return{
+        dataPoints: chartDataPoints,
+        dataMax: dataMaxLocal
+    };
+};        
 
 export class Visual implements IVisual {
 
