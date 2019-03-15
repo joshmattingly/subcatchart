@@ -144,10 +144,13 @@ export class Visual implements IVisual {
         let height: number = options.viewport.height - margin.top - margin.bottom;
 
         let dataMax = d3.max(viewModel.dataPoints, (d)=>+d.value);
-        let increment: number = 3;
 
         // creates a unique list of selected categories (based on PBI filter)
         let categoryList = d3.map(viewModel.dataPoints, (d)=> d.category.toString());
+        
+        // num_cats and increment will help offset the subcategory values to align with the y-axis tick marks
+        let num_cats:number = categoryList.size()
+        let increment: number;
 
         let xScale = d3.scaleLinear()
             .domain([0, dataMax])
@@ -194,6 +197,12 @@ export class Visual implements IVisual {
         .append("path")
         .attr("d", this.symbol.size(20).type(d3.symbolTriangle))
         .attr("fill", function(d){
+            if(num_cats == 1){
+                increment = height / (num_cats + 1);
+            } else {
+                increment = height / (num_cats * 2);
+            };
+
             if (+d.changeMetric < 0){
                 return 'red';
             } else if (+d.changeMetric > 0){
