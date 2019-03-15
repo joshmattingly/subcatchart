@@ -152,7 +152,7 @@ export class Visual implements IVisual {
         let num_cats:number = categoryList.size()
         let increment: number;
 
-        let xScale = d3.scaleLinear()
+        let xScale = d3.scaleSqrt()
             .domain([0, dataMax])
             .range([0, width]);
 
