@@ -6,8 +6,8 @@
         "visualClassName": "SubcatChart",
         "version": "1.0.0",
         "description": "Maps primary metric of a given subcategory along the x-axis, with a change metric designating direction of arrow",
-        "supportUrl": "",
-        "gitHubUrl": ""
+        "supportUrl": "www.joshmattingly.com",
+        "gitHubUrl": "https://github.com/joshmattingly/subcatchart"
     },
     "apiVersion": "2.2.0",
     "author": {
