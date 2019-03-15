@@ -80,40 +80,21 @@ function visualTransform(options: VisualUpdateOptions, host: IVisualHost): Chart
         }
     };
 
-    let testData: SubcatDataPoint[] = [
-        {
-            category: 'BRAND A',
-            subcategory: 'PROD A',
-            value: 1000,
-            changeMetric: 0.05
-        },
-        {
-            category: 'BRAND B',
-            subcategory: 'PROD B',
-            value: 20,
-            changeMetric: -0.25
-        },
-        {
-            category: 'BRAND A',
-            subcategory: 'PROD C',
-            value: 300,
-            changeMetric: 0.15
-        },
-        {
-            category: 'BRAND B',
-            subcategory: 'PROD D',
-            value: 500,
-            changeMetric: -0.05
-        }
-    ];
-
     let viewModel: ChartViewModel = {
-        dataPoints: testData,
-        dataMax: d3.max(testData.map((d) => d.value))
+        dataPoints: [],
+        dataMax: 0
     };
     
-    if (!dataViews){
-        return viewModel;
+    if (!dataViews
+        ||!dataViews[0].matrix
+        ||!dataViews[0].matrix.rows
+        ||!dataViews[0].matrix.rows.root
+        ||!dataViews[0].matrix.rows.root.children[0].value                          // Category
+        ||!dataViews[0].matrix.rows.root.children[0].children[0].value              // Subcategory
+        ||!dataViews[0].matrix.rows.root.children[0].children[0].values[0].value    // X-Axis metric
+        ||!dataViews[0].matrix.rows.root.children[0].children.values[1].value       // Change metric
+        ){
+
     }
     //if the data being passed in is completely missing, send the empty viewmodel.
     //TODO: Map to matrix data structure.
